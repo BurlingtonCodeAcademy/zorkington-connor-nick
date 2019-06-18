@@ -134,25 +134,21 @@ async function mainStreet() {
     input = input.toLowerCase();
 
     // typing "where" will print out what the current room is
-    if(input.includes('where')) {
-      console.log(`You are in ${global.game.currentRoom.roomName}`);
-    // prints the players inventory to the console
-    } else if(input.includes('inventory') || input.length === 1 && input.includes('i')) {
-      global.game.user.showInventory();
+    if (commonCommands(input)) {
     // else catches all input specific to the room
     } else {
       // read the sign
-      if (input.includes("read") && input.includes("sign")) {
+      if (input.includes("read") || input.includes("look") && input.includes("sign")) {
         console.log(
           `The sign says "Welcome to Burlington Code Academy! 
 Come on up to the third floor. If the door is locked, use the code 12345."`);
 
       // take the sign
-      } else if (input.includes("take") || input.includes("grab") && input.includes("sign")) {
+      } else if (input.includes("take") || input.includes("grab") || input.includes("smash") && input.includes("sign")) {
         console.log(`That would be selfish. How will other students find their way?`);
 
       // open door will not open door
-      } else if (input.includes("open") && input.includes("door")) {
+      } else if (input.includes("open") && input.includes("door") || input.includes("go") && input.includes("inside")) {
         console.log(`The door is locked. There is a keypad on the door handle.`);
 
         // enter code / key in code to door
@@ -167,8 +163,8 @@ Come on up to the third floor. If the door is locked, use the code 12345."`);
         } else {
           console.log(`BZZZTT wrong code`);
         }
-      } else if (input.includes("mr mikes") || input.includes("eat")){
-        console.log('You go eat and grab a beer.');
+      } else if (input.includes("mr mikes") || input.includes("eat") || input.includes("drink") && input.includes("beer")){
+        console.log('You go eat and grab a beer at Mr. Mikes. You are full and happy');
         global.game.user.changeStatus('Full and Happy');
         process.exit();
         // catch-all for unrecognized input
@@ -192,10 +188,9 @@ async function foyer() {
     let input = await ask('\n>_');
     input = input.toLowerCase();
 
-    if(input.includes('where')) {
-      console.log(`You are in ${global.game.currentRoom.roomName}`);
-    } else if(input.includes('inventory') || input.length === 1 && input.includes('i')) {
-      global.game.user.showInventory();
+    //check for common commands
+    if (commonCommands(input)) {
+      // do nothing, because a common command was found
     } else {
       // take the seven days paper
       if ( input.includes("take") && (input.includes("paper") || input.includes("seven days")) ) {
@@ -226,7 +221,8 @@ async function foyer() {
         inRoom = false;
         // catch-all for unrecognized input
       } else {
-        console.log(`Sorry I don't know how to ${input}`);
+        console.log(`Sorry I don't know how tolet compareSimilarity = (input, triggerWords) => {
+${input}`);
       }
     }
   } // end while
@@ -246,10 +242,8 @@ async function classroom() {
     let input = await ask('\n>_');
     input = input.toLowerCase();
 
-    if(input.includes('where')) {
-      console.log(`You are in ${global.game.currentRoom.roomName}`);
-    } else if(input.includes('inventory') || input.length === 1 && input.includes('i')) {
-      global.game.user.showInventory();
+    if (commonCommands(input)) {
+      // do nothing, because common command
     } else {
 
       // take the seven days paper
@@ -311,6 +305,37 @@ let rooms = {
   Hallway: new Room(roomNames.Hallway),
   Classroom: new Room(roomNames.Classroom)
 };
+
+// helper function compares an input to a an array of key words
+let compareSimilarity = (input, triggerWords) => {
+  let count = 0
+  let inputArr = input.split(' ')
+  triggerWords.forEach(word =>
+    inputArr.forEach(inputWord => {
+      if (word === inputWord) {
+        count++;
+      }
+    })
+  );
+  if (((count / triggerWords.length) * 100) >= 50) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+// function that checks for the common commands for every room
+function commonCommands(input) {
+  if (input.includes('where')) {
+    console.log(`You are in ${global.game.currentRoom.roomName}`);
+    return true;
+  } else if (input.includes('inventory') || input.length === 1 && input.includes('i')) {
+    global.game.user.showInventory();
+    return true;
+  }
+  return false;
+}
+
 
 // play game
 initGame();
