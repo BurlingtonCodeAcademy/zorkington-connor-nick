@@ -88,7 +88,7 @@ class Player {
     this.inventory.splice(this.inventory.indexOf(item), 1);
     global.game.currentRoom.addToInventory(item);
   }
-  showInventory() {
+  showInventory() { 
     console.log(`Player Inv: ${this.inventory}`);
   }
 }
@@ -96,12 +96,16 @@ class Player {
 
 /**** Game Logic ****/
 
+// creates a global GameState object and starts
+// the code for the first 'room'
 async function initGame() {
   let userName = await ask("Hello, what is your name? \n>");
   global.game = new GameState(userName);
   play(global.game.currentRoom);
 }
 
+//the play function runs the code for each room
+// when the player switches rooms
 async function play(currentRoom) {
   
   if (currentRoom.roomName === roomNames.Main) {
@@ -129,10 +133,13 @@ async function mainStreet() {
     let input = await ask('\n>_');
     input = input.toLowerCase();
 
+    // typing "where" will print out what the current room is
     if(input.includes('where')) {
       console.log(`You are in ${global.game.currentRoom.roomName}`);
+    // prints the players inventory to the console
     } else if(input.includes('inventory') || input.length === 1 && input.includes('i')) {
       global.game.user.showInventory();
+    // else catches all input specific to the room
     } else {
       // read the sign
       if (input.includes("read") && input.includes("sign")) {
@@ -141,7 +148,7 @@ async function mainStreet() {
 Come on up to the third floor. If the door is locked, use the code 12345."`);
 
       // take the sign
-      } else if (input.includes("take") && input.includes("sign")) {
+      } else if (input.includes("take") || input.includes("grab") && input.includes("sign")) {
         console.log(`That would be selfish. How will other students find their way?`);
 
       // open door will not open door
@@ -207,7 +214,7 @@ async function foyer() {
         if (global.game.user.inventory.find(item => item === "seven days")) {
           global.game.user.dropItem("seven days");
         } else {
-          console.log("You don't has that item");
+          console.log("You don't have that item!");
         }
         global.game.user.showInventory();
         global.game.currentRoom.showInventory();
